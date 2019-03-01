@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  node:
+    image: node
+    command: yarn start
+    user: "1000:1000"
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
