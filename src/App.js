@@ -49,14 +49,15 @@ function Task({
   const handleStartChange = e => {
     const [modifier, useHour] = getAction(e);
     const newStart = start.add(modifier, useHour ? 'hour' : 'minute');
-    if (end.diff(newStart) < 0) return;
+    if (end.diff(newStart) < 0 || newStart.diff(dayjs().startOf('day')) < 0)
+      return;
     onStartChange(newStart);
   };
 
   const handleEndChange = e => {
     const [modifier, useHour] = getAction(e);
     const newEnd = end.add(modifier, useHour ? 'hour' : 'minute');
-    if (start.diff(newEnd) > 0) return;
+    if (start.diff(newEnd) > 0 || newEnd.diff(dayjs().endOf('day')) > 0) return;
     onEndChange(newEnd);
   };
 
@@ -119,10 +120,18 @@ Task.defaultProps = {
 
 function TaskCreate({ onSubmit }) {
   const [title, setTitle] = useState('');
+  const [buttonText, setButtonText] = useState('Start Timer');
+  const [buttonActive, setButtonActive] = useState(false);
   const submit = () => {
     if (title === '') return;
     onSubmit(title);
     setTitle('');
+    setButtonText('Timer started...');
+    setButtonActive(true);
+    setTimeout(() => {
+      setButtonText('Start timer');
+      setButtonActive(false);
+    }, 2000);
   };
   const handleKeyDown = e => e.which === 13 && submit();
 
@@ -135,8 +144,12 @@ function TaskCreate({ onSubmit }) {
         onChange={e => setTitle(e.target.value)}
         onKeyDown={handleKeyDown}
       />
-      <button type="button" className="task-create-submit" onClick={submit}>
-        Start Timer
+      <button
+        type="button"
+        className={`task-create-submit ${(title || buttonActive) && 'active'}`}
+        onClick={submit}
+      >
+        {buttonText}
       </button>
     </div>
   );
@@ -146,11 +159,63 @@ TaskCreate.propTypes = {
   onSubmit: PropTypes.func.isRequired,
 };
 
+function Timeline({ tasks, startOfDay, endOfDay }) {
+  const sod = dayjs()
+    .startOf('day')
+    .set('hour', startOfDay);
+
+  const eod = dayjs()
+    .startOf('day')
+    .set('hour', endOfDay);
+
+  const pos = time =>
+    (time.diff(sod, 'second') / eod.diff(sod, 'second')) * 100;
+
+  const colors = [
+    '#D9BBFF',
+    '#C0A2FF',
+    '#A688FF',
+    '#8D6FFF',
+    '#7355EA',
+    '#5A3CD1',
+  ];
+
+  return (
+    <div className="timeline">
+      {tasks.map((task, i) => (
+        <div
+          key={task.id}
+          className="timeline-item"
+          style={{
+            left: `${pos(task.start)}%`,
+            width: `${pos(task.end) - pos(task.start)}%`,
+            backgroundColor: colors[i % colors.length],
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+Timeline.propTypes = {
+  tasks: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      title: PropTypes.string.isRequired,
+      start: PropTypes.instanceOf(dayjs).isRequired,
+      end: PropTypes.instanceOf(dayjs).isRequired,
+      active: PropTypes.bool.isRequired,
+    })
+  ).isRequired,
+  startOfDay: PropTypes.number.isRequired,
+  endOfDay: PropTypes.number.isRequired,
+};
+
 function getStoredTasks() {
-  const tasks = JSON.parse(window.localStorage.getItem('tasks'));
-  return tasks === null
+  const value = JSON.parse(window.localStorage.getItem('tasks'));
+  return value === null
     ? []
-    : tasks.map(task => ({
+    : value.map(task => ({
         ...task,
         start: dayjs(task.start),
         end: dayjs(task.end),
@@ -158,19 +223,31 @@ function getStoredTasks() {
 }
 
 function getStoredNextId() {
-  const nextId = JSON.parse(window.localStorage.getItem('nextId'));
-  return nextId === null ? 1 : nextId;
+  const value = JSON.parse(window.localStorage.getItem('nextId'));
+  return value === null ? 1 : value;
 }
 
 function getStoredShowSeconds() {
-  const showSeconds = JSON.parse(window.localStorage.getItem('showSeconds'));
-  return showSeconds === null ? true : showSeconds;
+  const value = JSON.parse(window.localStorage.getItem('showSeconds'));
+  return value === null ? true : value;
+}
+
+function getStoredStartOfDay() {
+  const value = JSON.parse(window.localStorage.getItem('startOfDay'));
+  return value === null ? 9 : parseInt(value, 10);
+}
+
+function getStoredEndOfDay() {
+  const value = JSON.parse(window.localStorage.getItem('endOfDay'));
+  return value === null ? 17 : parseInt(value, 10);
 }
 
 function App() {
   const [showSeconds, setShowSeconds] = useState(getStoredShowSeconds());
   const [nextId, setNextId] = useState(getStoredNextId());
   const [tasks, setTasks] = useState(getStoredTasks());
+  const [startOfDay, setStartOfDay] = useState(getStoredStartOfDay());
+  const [endOfDay, setEndOfDay] = useState(getStoredEndOfDay());
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -187,6 +264,8 @@ function App() {
     window.localStorage.setItem('nextId', JSON.stringify(nextId));
     window.localStorage.setItem('tasks', JSON.stringify(tasks));
     window.localStorage.setItem('showSeconds', JSON.stringify(showSeconds));
+    window.localStorage.setItem('startOfDay', JSON.stringify(startOfDay));
+    window.localStorage.setItem('endOfDay', JSON.stringify(endOfDay));
   });
 
   const handleTitleChange = (task, newTitle) => {
@@ -225,6 +304,7 @@ function App() {
 
   return (
     <div className="app">
+      <Timeline tasks={tasks} startOfDay={startOfDay} endOfDay={endOfDay} />
       <TaskCreate onSubmit={handleTaskSubmit} />
       <div className="task-list">
         {tasks.map(task => (
@@ -243,9 +323,9 @@ function App() {
           />
         ))}
       </div>
-      {tasks.length > 0 && (
+      {tasks.length > 1 && (
         <div className="task-summary">
-          <div className="task-summary-description">Total</div>
+          <div className="task-summary-description" />
           <div className="task-summary-value">
             {toHumanTime(
               tasks.reduce(
@@ -259,15 +339,42 @@ function App() {
         </div>
       )}
       <div className="options">
-        <label htmlFor="showSeconds">
-          <input
-            type="checkbox"
-            id="showSeconds"
-            checked={showSeconds}
-            onChange={e => setShowSeconds(e.target.checked)}
-          />
-          Display Seconds
-        </label>
+        <div>
+          <label htmlFor="startOfDay">
+            Start of day hour
+            <input
+              type="text"
+              id="startOfDay"
+              className="options-input"
+              value={startOfDay}
+              onChange={e => setStartOfDay(e.target.value)}
+            />
+          </label>
+        </div>
+        <div>
+          <label htmlFor="endOfDay">
+            End of day hour
+            <input
+              type="text"
+              id="endOfDay"
+              className="options-input"
+              value={endOfDay}
+              onChange={e => setEndOfDay(e.target.value)}
+            />
+          </label>
+        </div>
+        <div>
+          <label htmlFor="showSeconds">
+            Display Seconds
+            <input
+              type="checkbox"
+              id="showSeconds"
+              className="options-input"
+              checked={showSeconds}
+              onChange={e => setShowSeconds(e.target.checked)}
+            />
+          </label>
+        </div>
         <div className="info">
           <div>Use your arrow keys (+ shift) to modify timestamps</div>
         </div>

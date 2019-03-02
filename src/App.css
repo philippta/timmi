@@ -14,9 +14,21 @@ body {
 }
 
 .app {
-  padding: 2.5em 3em;
+  padding: 6em 0 0 0;
   max-width: 900px;
   margin: auto;
+}
+
+.options-input {
+  font-size: 1em;
+  padding: 0.2em;
+  background: transparent;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-left: 0.5em;
+  margin-bottom: 0.5em;
+  width: 3em;
+  text-align: center;
 }
 
 .task-item {
@@ -73,16 +85,21 @@ body {
   background-color: #eee;
   border: 1px solid #eee;
   width: 65px;
-  padding: 0.5em;
-  font-size: 1em;
+  padding: 0.6em 0.5em;
+  font-size: 0.9em;
   border-radius: 4px;
   outline: 0;
   cursor: pointer;
   margin-left: 0.25em;
+  transition: color, background-color, box-shadow;
+  transition-duration: 150ms;
+  box-shadow: 0;
+  color: #aaa;
+  font-weight: bold;
 }
 
 .task-item-toggle:hover,
-.task-item-toggle:focus {
+.task-item-toggle:active {
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
 }
 
@@ -102,6 +119,7 @@ body {
   cursor: pointer;
   margin-left: 0.25em;
   width: 1em;
+  font-size: 1em;
 }
 
 .task-item:hover .task-item-delete {
@@ -121,19 +139,32 @@ body {
   background: transparent;
   border: 1px solid #ddd;
   border-radius: 4px;
-  margin-right: 1em;
+  margin-right: 0.5em;
   outline: 0;
 }
 
 .task-create-submit {
-  background-color: #7355ea;
+  background-color: #eee;
+  color: #bbb;
   border: none;
-  padding: 0.5em 2em;
+  font-weight: bold;
+  padding: 0.5em;
   font-size: 1em;
   border-radius: 4px;
   outline: 0;
   cursor: pointer;
-  font-weight: bold;
+  transition: color, background-color;
+  transition-duration: 200ms;
+  width: 10em;
+}
+
+.task-create-submit:hover,
+.task-create-submit:active {
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.task-create-submit.active {
+  background-color: #7355ea;
   color: white;
 }
 
@@ -171,4 +202,22 @@ body {
   margin-top: 0.8em;
   color: #888;
   font-size: 0.8em;
+}
+
+.timeline {
+  overflow: hidden;
+  height: 2em;
+  margin-bottom: 3em;
+  position: absolute;
+  left: 0.5em;
+  top: 0.5em;
+  right: 0.5em;
+}
+
+.timeline-item {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: #ddd;
+  border-radius: 4px;
 }
