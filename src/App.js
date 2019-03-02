@@ -4,12 +4,13 @@ import dayjs from 'dayjs';
 
 window.dayjs = dayjs;
 
-const startTime = dayjs().set('second', 0);
-const endTime = dayjs();
+function toHumanTime(duration, showSeconds) {
+  const hour = 60 * 60;
+  const minute = 60;
 
-function toHumanTime(diff) {
-  const hours = Math.floor(diff / 60);
-  const minutes = diff % 60;
+  const hours = Math.floor(duration / hour);
+  const minutes = Math.floor((duration - hours * hour) / minute);
+  const seconds = duration % 60;
 
   let str = '';
   if (hours > 0) {
@@ -17,6 +18,9 @@ function toHumanTime(diff) {
   }
   if (minutes > 0) {
     str += `${minutes}m`;
+  }
+  if (showSeconds && seconds > 0) {
+    str += `${seconds}s`;
   }
   return str;
 }
@@ -30,6 +34,8 @@ function Task({
   onEndChange,
   active,
   onActiveChange,
+  onDelete,
+  showSeconds,
 }) {
   const getAction = e => {
     const key = e.which || e.keyCode || 0;
@@ -54,7 +60,7 @@ function Task({
     onEndChange(newEnd);
   };
 
-  const timeDiff = toHumanTime(end.diff(start, 'minute'));
+  const timeDiff = toHumanTime(end.diff(start, 'second'), showSeconds);
 
   return (
     <div className="task-item">
@@ -64,8 +70,8 @@ function Task({
         value={title}
         onChange={e => onTitleChange(e.target.value)}
       />
+      {timeDiff && <span className="task-item-duration">{timeDiff}</span>}
       <div className="task-item-input-container">
-        {timeDiff && <span className="task-item-duration">{timeDiff}</span>}
         <input
           className="task-item-input"
           value={start.format('HH:mm')}
@@ -79,16 +85,17 @@ function Task({
           onKeyDown={handleEndChange}
           readOnly
         />
+        <button
+          className={`task-item-toggle ${active && 'active'}`}
+          type="button"
+          onClick={() => onActiveChange(!active)}
+        >
+          {active ? 'Stop' : 'Start'}
+        </button>
+        <button className="task-item-delete" type="button" onClick={onDelete}>
+          ×
+        </button>
       </div>
-      <button
-        className="task-item-toggle"
-        type="button"
-        onClick={() => onActiveChange(!active)}
-      >
-        {active ? 'Stop' : 'Start'}
-      </button>
-      <br />
-      <br />
     </div>
   );
 }
@@ -102,27 +109,68 @@ Task.propTypes = {
   onEndChange: PropTypes.func.isRequired,
   active: PropTypes.bool.isRequired,
   onActiveChange: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  showSeconds: PropTypes.bool,
 };
 
-function App() {
+Task.defaultProps = {
+  showSeconds: true,
+};
+
+function TaskCreate({ onSubmit }) {
   const [title, setTitle] = useState('');
-  const [nextId, setNextId] = useState(3);
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: 'Task 1',
-      start: startTime,
-      end: endTime,
-      active: false,
-    },
-    {
-      id: 2,
-      title: 'Task 2',
-      start: startTime,
-      end: endTime,
-      active: false,
-    },
-  ]);
+  const submit = () => {
+    if (title === '') return;
+    onSubmit(title);
+    setTitle('');
+  };
+  const handleKeyDown = e => e.which === 13 && submit();
+
+  return (
+    <div className="task-create">
+      <input
+        type="text"
+        className="task-create-input"
+        value={title}
+        onChange={e => setTitle(e.target.value)}
+        onKeyDown={handleKeyDown}
+      />
+      <button type="button" className="task-create-submit" onClick={submit}>
+        Start Timer
+      </button>
+    </div>
+  );
+}
+
+TaskCreate.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+};
+
+function getStoredTasks() {
+  const tasks = JSON.parse(window.localStorage.getItem('tasks'));
+  return tasks === null
+    ? []
+    : tasks.map(task => ({
+        ...task,
+        start: dayjs(task.start),
+        end: dayjs(task.end),
+      }));
+}
+
+function getStoredNextId() {
+  const nextId = JSON.parse(window.localStorage.getItem('nextId'));
+  return nextId === null ? 1 : nextId;
+}
+
+function getStoredShowSeconds() {
+  const showSeconds = JSON.parse(window.localStorage.getItem('showSeconds'));
+  return showSeconds === null ? true : showSeconds;
+}
+
+function App() {
+  const [showSeconds, setShowSeconds] = useState(getStoredShowSeconds());
+  const [nextId, setNextId] = useState(getStoredNextId());
+  const [tasks, setTasks] = useState(getStoredTasks());
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -135,8 +183,16 @@ function App() {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    window.localStorage.setItem('nextId', JSON.stringify(nextId));
+    window.localStorage.setItem('tasks', JSON.stringify(tasks));
+    window.localStorage.setItem('showSeconds', JSON.stringify(showSeconds));
+  });
+
   const handleTitleChange = (task, newTitle) => {
-    setTasks(tasks.map(t => (task.id === t.id ? { ...task, newTitle } : t)));
+    setTasks(
+      tasks.map(t => (task.id === t.id ? { ...task, title: newTitle } : t))
+    );
   };
 
   const handleTimeChange = (task, which, time) => {
@@ -149,7 +205,11 @@ function App() {
     setTasks(tasks.map(t => (task.id === t.id ? { ...task, active } : t)));
   };
 
-  const handleTaskSubmit = () => {
+  const handleDelete = task => {
+    setTasks(tasks.filter(t => task.id !== t.id));
+  };
+
+  const handleTaskSubmit = title => {
     setTasks([
       ...tasks,
       {
@@ -161,26 +221,11 @@ function App() {
       },
     ]);
     setNextId(nextId + 1);
-    setTitle('');
   };
 
   return (
     <div className="app">
-      <div className="task-create">
-        <input
-          type="text"
-          className="task-create-input"
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-        />
-        <button
-          type="button"
-          className="task-create-submit"
-          onClick={handleTaskSubmit}
-        >
-          Start Timer
-        </button>
-      </div>
+      <TaskCreate onSubmit={handleTaskSubmit} />
       <div className="task-list">
         {tasks.map(task => (
           <Task
@@ -193,17 +238,39 @@ function App() {
             onStartChange={time => handleTimeChange(task, 'start', time)}
             onEndChange={time => handleTimeChange(task, 'end', time)}
             onActiveChange={active => handleActiveChange(task, active)}
+            onDelete={() => handleDelete(task)}
+            showSeconds={showSeconds}
           />
         ))}
       </div>
-      <div className="task-summary">
-        Total:{' '}
-        {toHumanTime(
-          tasks.reduce(
-            (sum, task) => sum + task.end.diff(task.start, 'minute'),
-            0
-          )
-        )}
+      {tasks.length > 0 && (
+        <div className="task-summary">
+          <div className="task-summary-description">Total</div>
+          <div className="task-summary-value">
+            {toHumanTime(
+              tasks.reduce(
+                (sum, task) => sum + task.end.diff(task.start, 'second'),
+                0
+              ),
+              true
+            )}
+          </div>
+          <div className="task-summary-spacer" />
+        </div>
+      )}
+      <div className="options">
+        <label htmlFor="showSeconds">
+          <input
+            type="checkbox"
+            id="showSeconds"
+            checked={showSeconds}
+            onChange={e => setShowSeconds(e.target.checked)}
+          />
+          Display Seconds
+        </label>
+        <div className="info">
+          <div>Use your arrow keys (+ shift) to modify timestamps</div>
+        </div>
       </div>
     </div>
   );

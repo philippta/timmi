@@ -15,6 +15,8 @@ body {
 
 .app {
   padding: 2.5em 3em;
+  max-width: 900px;
+  margin: auto;
 }
 
 .task-item {
@@ -22,6 +24,8 @@ body {
   flex-direction: row;
   align-items: center;
   padding: 0.25em 0;
+  position: relative;
+  margin-right: -1em;
 }
 
 .task-item-title {
@@ -36,6 +40,11 @@ body {
 
 .task-item-title:focus {
   border-color: #ddd;
+}
+
+.task-item-input-container {
+  width: 15.5em;
+  text-align: right;
 }
 
 .task-item-input {
@@ -56,6 +65,7 @@ body {
 
 .task-item-duration {
   font-size: 0.8em;
+  margin: 0 0.25em 0 0.5em;
   font-weight: bold;
 }
 
@@ -68,11 +78,34 @@ body {
   border-radius: 4px;
   outline: 0;
   cursor: pointer;
+  margin-left: 0.25em;
 }
 
 .task-item-toggle:hover,
 .task-item-toggle:focus {
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.task-item-toggle.active {
+  background-color: #7355ea;
+  color: white;
+}
+
+.task-item-delete {
+  visibility: hidden;
+  background-color: transparent;
+  border: 0;
+  padding: 0.5em;
+  font-size: 1em;
+  border-radius: 4px;
+  outline: 0;
+  cursor: pointer;
+  margin-left: 0.25em;
+  width: 1em;
+}
+
+.task-item:hover .task-item-delete {
+  visibility: visible;
 }
 
 .task-create {
@@ -102,4 +135,40 @@ body {
   cursor: pointer;
   font-weight: bold;
   color: white;
+}
+
+.task-summary {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.task-summary-description {
+  flex: 1;
+  padding: 0.5em;
+}
+
+.task-summary-value {
+  font-size: 0.8em;
+  font-weight: bold;
+  text-align: right;
+  font-size: 0.8em;
+  padding: 0.25em;
+}
+
+.task-summary-spacer {
+  width: 14.5em;
+}
+
+.options {
+  position: fixed;
+  bottom: 1em;
+  right: 1em;
+  text-align: right;
+}
+
+.info {
+  margin-top: 0.8em;
+  color: #888;
+  font-size: 0.8em;
 }
