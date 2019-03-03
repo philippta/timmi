@@ -144,8 +144,6 @@ body {
 }
 
 .task-create-submit {
-  background-color: #eee;
-  color: #bbb;
   border: none;
   font-weight: bold;
   padding: 0.5em;
@@ -156,16 +154,13 @@ body {
   transition: color, background-color;
   transition-duration: 200ms;
   width: 10em;
+  background-color: #7355ea;
+  color: white;
 }
 
 .task-create-submit:hover,
 .task-create-submit:active {
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
-}
-
-.task-create-submit.active {
-  background-color: #7355ea;
-  color: white;
 }
 
 .task-summary {
