@@ -2,6 +2,8 @@
 
 Timmi is a minimal private Time Tracker for your basic time tracking needs. Track your time effortlessly right in your browser without the need to login to a 3rd party.
 
+![Timmi](/screenshot.png){: .shadow .text-center}
+
 ## Private by default
 
 Everything you track with Timmi is stored in your local browser session.
