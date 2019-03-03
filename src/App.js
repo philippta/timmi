@@ -130,6 +130,15 @@ function App() {
           <div>Use your arrow keys (+ shift) to modify timestamps</div>
         </div>
       </div>
+      <div className="links">
+        <a
+          rel="noopener noreferrer"
+          href="https://gitlab.com/philippta/timmi/"
+          target="_blank"
+        >
+          Repo
+        </a>
+      </div>
     </div>
   );
 }
