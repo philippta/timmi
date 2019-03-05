@@ -14,6 +14,8 @@ export default function Task({
   onActiveChange,
   onDelete,
   showSeconds,
+  onHover,
+  offHover
 }) {
   const getAction = e => {
     const key = e.which || e.keyCode || 0;
@@ -42,7 +44,9 @@ export default function Task({
   const timeDiff = toHumanTime(end.diff(start, 'second'), showSeconds);
 
   return (
-    <div className="task-item">
+    <div className="task-item"
+      onMouseEnter={onHover}
+      onMouseLeave={offHover}>
       <input
         type="text"
         className="task-item-title"
