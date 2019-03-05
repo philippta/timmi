@@ -8,6 +8,7 @@ import OptionTextInput from './components/OptionTextInput';
 import OptionCheckboxInput from './components/OptionCheckboxInput';
 
 function App() {
+  const [highlightedTask, setHighlightedTask] = useState(null);
   const [showSeconds, setShowSeconds] = useState(
     getLocalStore('showSeconds', true)
   );
@@ -64,7 +65,11 @@ function App() {
 
   return (
     <div className="app">
-      <Timeline tasks={tasks} startOfDay={startOfDay} endOfDay={endOfDay} />
+      <Timeline
+        tasks={tasks}
+        highlightedTask={highlightedTask}
+        startOfDay={startOfDay}
+        endOfDay={endOfDay} />
       <TaskCreate onSubmit={submitTask} />
       <div className="task-list">
         {tasks.map(task => (
@@ -79,6 +84,8 @@ function App() {
             onEndChange={time => changeTaskProp(task, 'end', time)}
             onActiveChange={active => changeTaskProp(task, 'active', active)}
             onDelete={() => deleteTask(task)}
+            onHover={() => setHighlightedTask(task.id)}
+            offHover={() => setHighlightedTask(null)}
             showSeconds={showSeconds}
           />
         ))}
