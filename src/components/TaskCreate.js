@@ -18,13 +18,21 @@ const randomPlaceholder =
 export default function TaskCreate({ onSubmit }) {
   const [title, setTitle] = useState('');
   const [buttonText, setButtonText] = useState('Start Timer');
+  const [buttonActive, setButtonActive] = useState(false);
+  const [buttonClass, setButtonClass] = useState('');
   const submit = () => {
-    if (title === '') return;
+    if (title === '') {
+      setButtonClass('error');
+      setTimeout(() => setButtonClass(''), 500);
+      return;
+    }
     onSubmit(title);
     setTitle('');
-    setButtonText('Timer started...');
+    setButtonText('Timer started!');
+    setButtonActive(true);
     setTimeout(() => {
       setButtonText('Start timer');
+      setButtonActive(false);
     }, 2000);
   };
   const handleKeyDown = e => e.which === 13 && submit();
@@ -39,7 +47,13 @@ export default function TaskCreate({ onSubmit }) {
         onKeyDown={handleKeyDown}
         placeholder={randomPlaceholder}
       />
-      <button type="button" className="task-create-submit" onClick={submit}>
+      <button
+        type="button"
+        className={`task-create-submit ${
+          title !== '' || buttonActive ? 'active' : ''
+        } ${buttonClass}`}
+        onClick={submit}
+      >
         {buttonText}
       </button>
     </div>

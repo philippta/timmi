@@ -9,6 +9,20 @@ body {
   font-size: 1rem;
 }
 
+@keyframes wiggle {
+  0% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(3px);
+  }
+  40%,
+  80% {
+    transform: translateX(-3px);
+  }
+}
+
 .flex-fill {
   flex: 1;
 }
@@ -152,10 +166,18 @@ body {
   outline: 0;
   cursor: pointer;
   transition: color, background-color;
-  transition-duration: 200ms;
+  transition-duration: 150ms;
   width: 10em;
   background-color: #7355ea;
-  color: white;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.task-create-submit.error {
+  animation: wiggle 500ms linear;
+}
+
+.task-create-submit.active {
+  color: rgba(255, 255, 255, 1);
 }
 
 .task-create-submit:hover,
