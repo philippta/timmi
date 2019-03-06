@@ -51,7 +51,7 @@ function App() {
 
   const submitTask = title => {
     setTasks([
-      ...tasks,
+      ...tasks.map(task => ({ ...task, active: false })),
       {
         id: nextId,
         title,
