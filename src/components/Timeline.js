@@ -6,7 +6,8 @@ export default function Timeline({
   tasks,
   startOfDay,
   endOfDay,
-  highlightedTask }) {
+  highlightedTask,
+}) {
   const sod = dayjs()
     .startOf('day')
     .set('hour', parseInt(startOfDay, 10));
@@ -37,9 +38,12 @@ export default function Timeline({
             left: `${pos(task.start)}%`,
             width: `${pos(task.end) - pos(task.start)}%`,
             backgroundColor: colors[i % colors.length],
-            border: (task.id === highlightedTask) ? '1px solid grey' : 'none'
           }}
-        />
+        >
+          <div
+            className={`highlight ${task.id === highlightedTask ? 'show' : ''}`}
+          />
+        </div>
       ))}
     </div>
   );
@@ -59,4 +63,9 @@ Timeline.propTypes = {
     .isRequired,
   endOfDay: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
     .isRequired,
+  highlightedTask: PropTypes.number,
+};
+
+Timeline.defaultProps = {
+  highlightedTask: null,
 };

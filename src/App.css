@@ -201,11 +201,11 @@ body {
 
 .timeline {
   overflow: hidden;
-  height: 2em;
+  height: 2.5em;
   margin-bottom: 3em;
   position: absolute;
   left: 0.5em;
-  top: 0.5em;
+  top: 0.25em;
   right: 0.5em;
 }
 
@@ -213,8 +213,26 @@ body {
   position: absolute;
   top: 0;
   bottom: 0;
-  background: #ddd;
   border-radius: 4px;
+  height: 2em;
+  margin-top: 0.25em;
+}
+
+.timeline-item .highlight {
+  height: 100%;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.15),
+    rgba(255, 255, 255, 0.15) 8px,
+    rgba(0, 0, 0, 0) 8px,
+    rgba(0, 0, 0, 0) 16px
+  );
+  opacity: 0;
+  transition: 200ms opacity;
+}
+
+.timeline-item .highlight.show {
+  opacity: 1;
 }
 
 .links {

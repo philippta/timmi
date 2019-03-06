@@ -69,7 +69,8 @@ function App() {
         tasks={tasks}
         highlightedTask={highlightedTask}
         startOfDay={startOfDay}
-        endOfDay={endOfDay} />
+        endOfDay={endOfDay}
+      />
       <TaskCreate onSubmit={submitTask} />
       <div className="task-list">
         {tasks.map(task => (
@@ -85,7 +86,7 @@ function App() {
             onActiveChange={active => changeTaskProp(task, 'active', active)}
             onDelete={() => deleteTask(task)}
             onHover={() => setHighlightedTask(task.id)}
-            offHover={() => setHighlightedTask(null)}
+            onBlur={() => setHighlightedTask(null)}
             showSeconds={showSeconds}
           />
         ))}
