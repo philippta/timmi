@@ -2,7 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
 
-export default function Timeline({ tasks, startOfDay, endOfDay }) {
+export default function Timeline({
+  tasks,
+  startOfDay,
+  endOfDay,
+  highlightedTask,
+}) {
   const sod = dayjs()
     .startOf('day')
     .set('hour', parseInt(startOfDay, 10));
@@ -34,7 +39,11 @@ export default function Timeline({ tasks, startOfDay, endOfDay }) {
             width: `${pos(task.end) - pos(task.start)}%`,
             backgroundColor: colors[i % colors.length],
           }}
-        />
+        >
+          <div
+            className={`highlight ${task.id === highlightedTask ? 'show' : ''}`}
+          />
+        </div>
       ))}
     </div>
   );
@@ -54,4 +63,9 @@ Timeline.propTypes = {
     .isRequired,
   endOfDay: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
     .isRequired,
+  highlightedTask: PropTypes.number,
+};
+
+Timeline.defaultProps = {
+  highlightedTask: null,
 };
