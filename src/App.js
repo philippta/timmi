@@ -4,6 +4,7 @@ import { toHumanTime, getLocalStore } from './helpers';
 import Task from './components/Task';
 import TaskCreate from './components/TaskCreate';
 import Timeline from './components/Timeline';
+import TimelineIndicator from './components/TimelineIndicator';
 import OptionTextInput from './components/OptionTextInput';
 import OptionCheckboxInput from './components/OptionCheckboxInput';
 
@@ -65,6 +66,10 @@ function App() {
 
   return (
     <div className="app">
+      <TimelineIndicator
+          startOfDay={startOfDay}
+          endOfDay={endOfDay}
+      />
       <Timeline
         tasks={tasks}
         highlightedTask={highlightedTask}

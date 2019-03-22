@@ -227,7 +227,7 @@ body {
   margin-bottom: 3em;
   position: absolute;
   left: 0.5em;
-  top: 0.25em;
+  top: 0.5em;
   right: 0.5em;
 }
 
@@ -268,4 +268,28 @@ body {
 .links a {
   color: #888;
   text-decoration: underline;
+}
+
+.timeline-indicator-wrapper {
+  position: absolute;
+  left: .5em;
+  top: 0;
+  right: .5em;
+  display: flex;
+  justify-content: space-between;
+}
+
+.timeline-indicator {
+  border-right: 1px solid black;
+  height: 10px;
+}
+.timeline-indicator:after {
+  content: attr(data-time);
+  left: 2em;
+  position: relative;
+  font-size: 0.65em;
+  top: -5px;
+}
+.timeline-indicator:last-of-type:after {
+  left: -1em;
 }
