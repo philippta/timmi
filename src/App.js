@@ -100,7 +100,7 @@ function App() {
                 (sum, task) => sum + task.end.diff(task.start, 'second'),
                 0
               ),
-              true
+              showSeconds
             )}
           </div>
           <div className="task-summary-spacer" />
