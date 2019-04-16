@@ -13,6 +13,9 @@ function App() {
   const [showSeconds, setShowSeconds] = useState(
     getLocalStore('showSeconds', true)
   );
+  const [showTimelineIndicators, setShowTimelineIndicators] = useState(
+    getLocalStore('showTimelineIndicators', true)
+  );
   const [nextId, setNextId] = useState(getLocalStore('nextId', 1));
   const [tasks, setTasks] = useState(
     getLocalStore('tasks', []).map(task => ({
@@ -41,6 +44,10 @@ function App() {
     window.localStorage.setItem('showSeconds', JSON.stringify(showSeconds));
     window.localStorage.setItem('startOfDay', JSON.stringify(startOfDay));
     window.localStorage.setItem('endOfDay', JSON.stringify(endOfDay));
+    window.localStorage.setItem(
+      'showTimelineIndicators',
+      JSON.stringify(showTimelineIndicators)
+    );
   });
 
   const changeTaskProp = (task, key, value) =>
@@ -66,10 +73,9 @@ function App() {
 
   return (
     <div className="app">
-      <TimelineIndicator
-          startOfDay={startOfDay}
-          endOfDay={endOfDay}
-      />
+      {showTimelineIndicators && (
+        <TimelineIndicator startOfDay={startOfDay} endOfDay={endOfDay} />
+      )}
       <Timeline
         tasks={tasks}
         highlightedTask={highlightedTask}
@@ -137,6 +143,15 @@ function App() {
             onChange={setShowSeconds}
           >
             Display Seconds
+          </OptionCheckboxInput>
+        </div>
+        <div>
+          <OptionCheckboxInput
+            labelKey="showTimelineIndicators"
+            checked={showTimelineIndicators}
+            onChange={setShowTimelineIndicators}
+          >
+            Timeline Indicators
           </OptionCheckboxInput>
         </div>
         <div className="info">
